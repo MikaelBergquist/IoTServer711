@@ -34,6 +34,7 @@ import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
+import java.io.ByteArrayOutputStream;
 import java.util.UUID;
 
 public class MainActivity extends Activity implements
@@ -293,11 +294,32 @@ public class MainActivity extends Activity implements
     //method to update count
     private void updateCount(int c){
         count = c;
+        int temp = c%4;
+        rfduinoService.send(hexToBytes(""+temp));
         Toast.makeText(MainActivity.this,"wear toggle:"+count,Toast.LENGTH_SHORT).show();
     }
 
 
+    private byte[] hexToBytes(String hex) {
+        //hex.length() / 2
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        for (int i = 0; i < hex.length(); i++) {
+            if (hex.charAt(i) == ' ') {
+                continue;
+            }
 
+            String hexByte;
+            if (i + 1 < hex.length()) {
+                hexByte = hex.substring(i, i + 2).trim();
+                i++;
+            } else {
+                hexByte = hex.substring(i, i + 1);
+            }
+
+            bytes.write(Integer.parseInt(hexByte, 16));
+        }
+        return bytes.toByteArray();
+    }
 
 
 
