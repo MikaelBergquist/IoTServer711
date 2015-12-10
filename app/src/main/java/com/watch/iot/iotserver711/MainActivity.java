@@ -251,10 +251,11 @@ public class MainActivity extends Activity implements
                 .build();
         mGoogleApiClient.connect();
     }
-    private void increaseCounter() {
+    private void resetCount() {
+        count = 0;
         PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/count");
         putDataMapReq.setUrgent();
-        putDataMapReq.getDataMap().putInt(COUNT_KEY, count++);
+        putDataMapReq.getDataMap().putInt(COUNT_KEY, 0);
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
         PendingResult<DataApi.DataItemResult> pendingResult =
                 Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
@@ -265,6 +266,7 @@ public class MainActivity extends Activity implements
         Toast.makeText(MainActivity.this, "connected", Toast.LENGTH_SHORT);
 
         Wearable.DataApi.addListener(mGoogleApiClient, this);
+        resetCount();
     }
 
     @Override
@@ -295,7 +297,9 @@ public class MainActivity extends Activity implements
     private void updateCount(int c){
         count = c;
         int temp = c%4;
-        rfduinoService.send(hexToBytes(""+temp));
+        if (state == STATE_CONNECTED) {
+            rfduinoService.send(hexToBytes(""+temp));
+        }
         Toast.makeText(MainActivity.this,"wear toggle:"+count,Toast.LENGTH_SHORT).show();
     }
 
